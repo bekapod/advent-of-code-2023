@@ -1,25 +1,53 @@
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/option
 import gleam/regex
 import gleam/result
 import gleam/string
 import simplifile
 
-fn read_input(filename: String) {
+pub fn read_input(filename: String) {
   let assert Ok(file) = simplifile.read(filename)
   file
   |> string.split("\n")
 }
 
-pub fn parse_digits(input: String) {
-  let assert Ok(re) = regex.from_string("[0-9]")
-  regex.scan(re, input)
-  |> list.map(fn(m) { m.content })
+pub fn parse_digits(input: String, parse_words: Bool) {
+  let assert Ok(re) = case parse_words {
+    True ->
+      regex.from_string(
+        "(?=(one|two|three|four|five|six|seven|eight|nine|[0-9]))\\w|\\d",
+      )
+    False -> regex.from_string("(?=(\\d))\\w|\\d")
+  }
+
+  let matches = regex.scan(re, input)
+
+  matches
+  |> list.map(fn(m) {
+    case m.content {
+      "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" -> m.content
+      _ -> {
+        case m.submatches {
+          [option.Some("one")] -> "1"
+          [option.Some("two")] -> "2"
+          [option.Some("three")] -> "3"
+          [option.Some("four")] -> "4"
+          [option.Some("five")] -> "5"
+          [option.Some("six")] -> "6"
+          [option.Some("seven")] -> "7"
+          [option.Some("eight")] -> "8"
+          [option.Some("nine")] -> "9"
+          _ -> "0"
+        }
+      }
+    }
+  })
 }
 
-pub fn capture_digits(input: String) {
-  case parse_digits(input) {
+pub fn capture_digits(input: List(String)) {
+  case input {
     [] -> ["0", "0"]
     [digit] -> [digit, digit]
     [first, ..rest] -> {
@@ -32,24 +60,33 @@ pub fn capture_digits(input: String) {
   }
 }
 
-pub fn get_calibration_value(input: String) {
-  capture_digits(input)
+pub fn get_calibration_value(input: List(String)) {
+  input
   |> string.concat
   |> int.parse
   |> result.unwrap(0)
 }
 
-pub fn part1(input: List(String)) {
+pub fn solve(input: List(String), parse_words: Bool) {
   input
+  |> list.map(fn(line) { parse_digits(line, parse_words) })
+  |> list.map(capture_digits)
   |> list.map(get_calibration_value)
-  |> list.fold(0, int.add)
+  |> int.sum
 }
 
 pub fn main() {
   io.println(
-    "Part 1: " <> {
+    "Part 1 answer: " <> {
       read_input("input.txt")
-      |> part1
+      |> solve(False)
+      |> int.to_string
+    },
+  )
+  io.println(
+    "Part 2 answer: " <> {
+      read_input("input.txt")
+      |> solve(True)
       |> int.to_string
     },
   )
