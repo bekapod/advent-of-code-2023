@@ -195,17 +195,45 @@ pub fn get_valid_parts_example_test() {
   ])
 }
 
-pub fn solve_example_skip() {
+pub fn get_valid_gears_example_test() {
   [
     "467..114..", "...*......", "..35..633.", "......#...", "617*......",
     ".....+.58.", "..592.....", "......755.", "...$.*....", ".664.598..",
   ]
-  |> day_03.solve
+  |> day_03.parse_schematic
+  |> day_03.get_valid_gears
+  |> should.equal([
+    #(Symbol(name: "*", coordinate: Coordinate(x: 5, y: 8)), [598, 755]),
+    #(Symbol(name: "*", coordinate: Coordinate(x: 3, y: 1)), [35, 467]),
+  ])
+}
+
+pub fn solve_part_1_example_test() {
+  [
+    "467..114..", "...*......", "..35..633.", "......#...", "617*......",
+    ".....+.58.", "..592.....", "......755.", "...$.*....", ".664.598..",
+  ]
+  |> day_03.solve_part1
   |> should.equal(4361)
 }
 
-pub fn solve_input_test() {
+pub fn solve_part_1_input_test() {
   day_03.read_input("input.txt")
-  |> day_03.solve
+  |> day_03.solve_part1
   |> should.equal(537_732)
+}
+
+pub fn solve_part_2_example_test() {
+  [
+    "467..114..", "...*......", "..35..633.", "......#...", "617*......",
+    ".....+.58.", "..592.....", "......755.", "...$.*....", ".664.598..",
+  ]
+  |> day_03.solve_part2
+  |> should.equal(467_835)
+}
+
+pub fn solve_part_2_input_test() {
+  day_03.read_input("input.txt")
+  |> day_03.solve_part2
+  |> should.equal(84_883_664)
 }

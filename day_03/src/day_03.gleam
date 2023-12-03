@@ -175,13 +175,67 @@ pub fn get_valid_parts(schematic: Schematic) {
   })
 }
 
+pub fn get_valid_gears(schematic: Schematic) {
+  schematic.symbols
+  |> list.filter_map(fn(symbol) {
+    case symbol.name {
+      "*" -> {
+        let parts =
+          schematic.parts
+          |> list.filter_map(fn(part) {
+            let first_coordinate =
+              part.coordinates
+              |> list.first
+            let last_coordinate =
+              part.coordinates
+              |> list.last
+
+            case #(first_coordinate, last_coordinate) {
+              #(Ok(first_coordinate), Ok(last_coordinate)) -> {
+                let x_range =
+                  list.range(last_coordinate.x - 1, first_coordinate.x + 1)
+                let y_range =
+                  list.range(last_coordinate.y - 1, first_coordinate.y + 1)
+                let is_in_x_range =
+                  x_range
+                  |> list.contains(symbol.coordinate.x)
+                let is_in_y_range =
+                  y_range
+                  |> list.contains(symbol.coordinate.y)
+
+                case is_in_x_range && is_in_y_range {
+                  True ->
+                    Ok(
+                      part.number
+                      |> list.reverse
+                      |> int.undigits(10)
+                      |> result.unwrap(0),
+                    )
+                  False -> Error("Invalid coordinates")
+                }
+              }
+
+              _ -> Error("Invalid coordinates")
+            }
+          })
+
+        case parts {
+          [_, _] -> Ok(#(symbol, parts))
+          _ -> Error("Incorrect number of parts")
+        }
+      }
+      _ -> Error("Not a gear")
+    }
+  })
+}
+
 pub fn read_input(filename: String) {
   let assert Ok(file) = simplifile.read(filename)
   file
   |> string.split("\n")
 }
 
-pub fn solve(input: List(String)) {
+pub fn solve_part1(input: List(String)) {
   input
   |> parse_schematic
   |> get_valid_parts
@@ -194,11 +248,22 @@ pub fn solve(input: List(String)) {
   |> int.sum
 }
 
+pub fn solve_part2(input: List(String)) {
+  input
+  |> parse_schematic
+  |> get_valid_gears
+  |> list.map(fn(gear) {
+    gear.1
+    |> int.product
+  })
+  |> int.sum
+}
+
 pub fn main() {
   io.println(
     "Part 1 answer: " <> {
       read_input("input.txt")
-      |> solve()
+      |> solve_part1
       |> int.to_string
     },
   )
