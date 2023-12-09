@@ -109,3 +109,15 @@ pub fn solve_part1_input_test() {
   |> day_04.solve_part1
   |> should.equal(25_651)
 }
+
+pub fn solve_part2_example_test() {
+  day_04.read_input("example.txt")
+  |> day_04.solve_part2
+  |> should.equal(30)
+}
+
+pub fn solve_part2_input_test() {
+  day_04.read_input("input.txt")
+  |> day_04.solve_part2
+  |> should.equal(19_499_881)
+}
