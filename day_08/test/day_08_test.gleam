@@ -42,3 +42,23 @@ pub fn solve_part1_input_test() {
   day_08.solve_part1("input.txt")
   |> should.equal(19_241)
 }
+
+pub fn solve_part2_example1_test() {
+  day_08.solve_part2("example1.txt")
+  |> should.equal(2)
+}
+
+pub fn solve_part2_example2_test() {
+  day_08.solve_part2("example2.txt")
+  |> should.equal(6)
+}
+
+pub fn solve_part2_example3_test() {
+  day_08.solve_part2("example3.txt")
+  |> should.equal(6)
+}
+
+pub fn solve_part2_input_test() {
+  day_08.solve_part2("input.txt")
+  |> should.equal(9_606_140_307_013)
+}
